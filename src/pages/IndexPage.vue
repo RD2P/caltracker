@@ -58,12 +58,18 @@
       class="fixed-bottom-right q-mb-md q-mr-md column items-center q-gutter-y-md"
     >
       <q-btn
-        round
-        color="orange"
-        icon="scale"
-        @click="showBodyWeightDialog()"
+      round
+      color="orange"
+      icon="scale"
+      @click="showBodyWeightDialog()"
       />
-      <q-btn round size="lg" icon="add_circle" color="green" />
+      <q-btn 
+      round 
+      size="lg" 
+      icon="add_circle" 
+      color="green" 
+      @click="showAddFoodDialog()"
+      />
     </div>
   </q-page>
 </template>
@@ -71,10 +77,12 @@
 <script>
 import { defineComponent, reactive, ref, computed } from "vue";
 import { useQuasar } from "quasar";
+import AddFoodDialog from 'components/AddFoodDialog.vue'
 
 export default defineComponent({
   name: "IndexPage",
   setup() {
+    const $q = useQuasar();
     const bodyWeight = ref(121);
     const targetCalories = 2800;
     const foods = reactive([
@@ -90,6 +98,10 @@ export default defineComponent({
         name: "Bread",
         calories: 300,
       },
+      {
+        name: "Spag",
+        calories: 100
+      }
     ]);
 
     const totalCalories = computed(() => {
@@ -102,7 +114,6 @@ export default defineComponent({
 
     const progress = (totalCalories.value / targetCalories) * 100;
 
-    const $q = useQuasar();
     function showBodyWeightDialog() {
       $q.dialog({
         title: "Body weight",
@@ -117,6 +128,12 @@ export default defineComponent({
       });
     }
 
+    function showAddFoodDialog() {
+      $q.dialog({
+        component: AddFoodDialog
+      })
+    }
+
     return {
       foods,
       bodyWeight,
@@ -124,6 +141,7 @@ export default defineComponent({
       totalCalories,
       progress,
       showBodyWeightDialog,
+      showAddFoodDialog
     };
   },
 });
