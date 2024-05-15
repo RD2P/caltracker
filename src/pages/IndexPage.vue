@@ -1,8 +1,15 @@
 <template>
   <q-page class="bg-grey-2">
-    <div class="row justify-between">
-      <q-btn label="Prev" icon="chevron_left" flat />
-      <q-btn label="Next" icon-right="chevron_right" flat />
+    <div class="row justify-between items-center q-py-md no-wrap">
+      <q-btn dense label="Prev" icon="chevron_left" flat no-caps/>
+
+      <q-btn-dropdown flat :label="formattedDate">
+        <div class="">
+          <q-date minimal v-model="date" />
+        </div>
+      </q-btn-dropdown>
+
+      <q-btn dense label="Next" icon-right="chevron_right" flat no-caps/>
     </div>
 
     <!-- Top card -->
@@ -58,17 +65,17 @@
       class="fixed-bottom-right q-mb-md q-mr-md column items-center q-gutter-y-md"
     >
       <q-btn
-      round
-      color="orange"
-      icon="scale"
-      @click="showBodyWeightDialog()"
+        round
+        color="orange"
+        icon="scale"
+        @click="showBodyWeightDialog()"
       />
-      <q-btn 
-      round 
-      size="lg" 
-      icon="add_circle" 
-      color="green" 
-      @click="showAddFoodDialog()"
+      <q-btn
+        round
+        size="lg"
+        icon="add_circle"
+        color="green"
+        @click="showAddFoodDialog()"
       />
     </div>
   </q-page>
@@ -77,7 +84,8 @@
 <script>
 import { defineComponent, reactive, ref, computed } from "vue";
 import { useQuasar } from "quasar";
-import AddFoodDialog from 'components/AddFoodDialog.vue'
+import { format } from "date-fns";
+import AddFoodDialog from "components/AddFoodDialog.vue";
 
 export default defineComponent({
   name: "IndexPage",
@@ -85,6 +93,7 @@ export default defineComponent({
     const $q = useQuasar();
     const bodyWeight = ref(121);
     const targetCalories = 2800;
+    const date = ref(new Date());
     const foods = reactive([
       {
         name: "Frozen Yogurt",
@@ -100,8 +109,8 @@ export default defineComponent({
       },
       {
         name: "Spag",
-        calories: 100
-      }
+        calories: 100,
+      },
     ]);
 
     const totalCalories = computed(() => {
@@ -130,9 +139,13 @@ export default defineComponent({
 
     function showAddFoodDialog() {
       $q.dialog({
-        component: AddFoodDialog
-      })
+        component: AddFoodDialog,
+      });
     }
+
+    const formattedDate = computed(() => {
+      return format(date.value, "MMMM do, yyyy");
+    });
 
     return {
       foods,
@@ -140,8 +153,10 @@ export default defineComponent({
       targetCalories,
       totalCalories,
       progress,
+      date,
       showBodyWeightDialog,
-      showAddFoodDialog
+      showAddFoodDialog,
+      formattedDate,
     };
   },
 });
