@@ -4,6 +4,8 @@
       <q-btn label="Prev" icon="chevron_left" flat />
       <q-btn label="Next" icon-right="chevron_right" flat />
     </div>
+
+    <!-- Top card -->
     <q-card
       flat
       style="font-size: 1rem"
@@ -23,7 +25,9 @@
           class="text-center"
         >
           <span style="line-height: 0.8rem">
-            <span style="font-size: 1.3rem" class="text-bold">{{ targetCalories - totalCalories }}</span
+            <span style="font-size: 1.3rem" class="text-bold">{{
+              targetCalories - totalCalories
+            }}</span
             ><br />
             <span class="text-caption">to go</span>
           </span>
@@ -31,15 +35,15 @@
       </div>
 
       <div class="text-center">
-        Body weight<br /><span class="text-bold">120 lbs</span>
+        Body weight<br /><span class="text-bold">{{ bodyWeight }} lbs</span>
       </div>
     </q-card>
 
     <q-markup-table class="q-px-lg">
-      <thead >
+      <thead>
         <tr>
-          <th style="font-size: 0.9rem;" class="text-left">Food</th>
-          <th style="font-size: 0.9rem;" class="text-right">Calories</th>
+          <th style="font-size: 0.9rem" class="text-left">Food</th>
+          <th style="font-size: 0.9rem" class="text-right">Calories</th>
         </tr>
       </thead>
       <tbody>
@@ -49,24 +53,33 @@
         </tr>
       </tbody>
     </q-markup-table>
-
-    <q-btn
+    
+    <div
+    class="fixed-bottom-right q-mb-md q-mr-md column items-center q-gutter-y-md"
+    >
+      <q-btn 
+        round 
+        color="orange" 
+        icon="scale" 
+      />
+      <q-btn
       round
-      unelevated      
-      size="xl"
+      size="lg"
       icon="add_circle"
       color="green"
-      class="fixed-bottom-right q-my-md q-mr-md"
-    />
+      />
+    </div>
+
   </q-page>
 </template>
 
 <script>
-import { defineComponent, reactive, computed } from "vue";
+import { defineComponent, reactive, ref, computed } from "vue";
 
 export default defineComponent({
   name: "IndexPage",
   setup() {
+    const bodyWeight = 121;
     const targetCalories = 2800;
     const foods = reactive([
       {
@@ -95,6 +108,7 @@ export default defineComponent({
 
     return {
       foods,
+      bodyWeight,
       targetCalories,
       totalCalories,
       progress,
@@ -102,3 +116,7 @@ export default defineComponent({
   },
 });
 </script>
+
+<style scoped>
+
+</style>
