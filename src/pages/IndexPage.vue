@@ -53,33 +53,29 @@
         </tr>
       </tbody>
     </q-markup-table>
-    
-    <div
-    class="fixed-bottom-right q-mb-md q-mr-md column items-center q-gutter-y-md"
-    >
-      <q-btn 
-        round 
-        color="orange" 
-        icon="scale" 
-      />
-      <q-btn
-      round
-      size="lg"
-      icon="add_circle"
-      color="green"
-      />
-    </div>
 
+    <div
+      class="fixed-bottom-right q-mb-md q-mr-md column items-center q-gutter-y-md"
+    >
+      <q-btn
+        round
+        color="orange"
+        icon="scale"
+        @click="showBodyWeightDialog()"
+      />
+      <q-btn round size="lg" icon="add_circle" color="green" />
+    </div>
   </q-page>
 </template>
 
 <script>
 import { defineComponent, reactive, ref, computed } from "vue";
+import { useQuasar } from "quasar";
 
 export default defineComponent({
   name: "IndexPage",
   setup() {
-    const bodyWeight = 121;
+    const bodyWeight = ref(121);
     const targetCalories = 2800;
     const foods = reactive([
       {
@@ -106,17 +102,31 @@ export default defineComponent({
 
     const progress = (totalCalories.value / targetCalories) * 100;
 
+    const $q = useQuasar();
+    function showBodyWeightDialog() {
+      $q.dialog({
+        title: "Body weight",
+        message: "How much do you weigh today?",
+        prompt: {
+          model: bodyWeight.value,
+          type: "number",
+        },
+        cancel: true,
+      }).onOk((value) => {
+        bodyWeight.value = value;
+      });
+    }
+
     return {
       foods,
       bodyWeight,
       targetCalories,
       totalCalories,
       progress,
+      showBodyWeightDialog,
     };
   },
 });
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>
