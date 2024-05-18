@@ -34,7 +34,7 @@
       </div>
     </q-card>
 
-    <q-markup-table class="q-px-lg q-my-md bg-grey-1">
+    <q-markup-table class="q-px-lg q-mt-md bg-grey-1">
       <thead>
         <tr>
           <th style="font-size: 0.9rem" class="text-left">Food</th>
@@ -49,8 +49,10 @@
       </tbody>
     </q-markup-table>
 
+    <div style="height:150px;"></div>
+
     <div
-      class="fixed-bottom-right q-mb-md q-mr-md column items-center q-gutter-y-md"
+      class="fixed-bottom-right q-mb-md q-mr-md column items-center q-gutter-y-md z-top"
     >
       <q-btn
         round
@@ -66,14 +68,14 @@
         @click="showAddFoodDialog()"
       />
     </div>
-    <div
-      class="fixed-bottom row justify-center q-mb-md"
-    >
-      <q-btn 
+
+    <div class="fixed-bottom q-mb-md row justify-center">
+      <q-btn
         round
         color="primary"
         outline
         icon="content_copy"
+        @click="copy()"
       />
     </div>
   </q-page>
@@ -83,6 +85,7 @@
 import { defineComponent, reactive, ref, computed } from "vue";
 import { useQuasar } from "quasar";
 import AddFoodDialog from "components/AddFoodDialog.vue";
+import { format } from "date-fns";
 
 export default defineComponent({
   name: "IndexPage",
@@ -119,6 +122,11 @@ export default defineComponent({
 
     const progress = (totalCalories.value / targetCalories) * 100;
 
+    const formattedDate = computed(() => {
+      const date = new Date()
+      return format(date, "MMMM do, yyyy");
+    });
+
     function showBodyWeightDialog() {
       $q.dialog({
         title: "Body weight",
@@ -139,7 +147,18 @@ export default defineComponent({
       });
     }
 
-
+    function copy() {
+      const text = `${formattedDate.value}\nBody Weight: ${bodyWeight.value} lbs\nTotal Calories: ${totalCalories.value}`;
+      navigator.clipboard.writeText(text);
+      $q.notify({
+        message: "Copied info to clipboard:",
+        caption: "Date, Body weight, Total Calories",
+        color: "white",
+        textColor: "primary",
+        closeBtn: "close"
+      });
+      console.log('copied')
+    }
 
     return {
       foods,
@@ -149,6 +168,7 @@ export default defineComponent({
       progress,
       showBodyWeightDialog,
       showAddFoodDialog,
+      copy,
     };
   },
 });
