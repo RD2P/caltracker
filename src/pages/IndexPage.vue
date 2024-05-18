@@ -1,22 +1,10 @@
 <template>
   <q-page class="bg-grey-2">
-    <div class="row justify-between items-center q-py-md no-wrap">
-      <q-btn dense label="Prev" icon="chevron_left" flat no-caps/>
-
-      <q-btn-dropdown flat :label="formattedDate">
-        <div class="">
-          <q-date minimal v-model="date" />
-        </div>
-      </q-btn-dropdown>
-
-      <q-btn dense label="Next" icon-right="chevron_right" flat no-caps/>
-    </div>
-
     <!-- Top card -->
     <q-card
       flat
       style="font-size: 1rem"
-      class="row items-center justify-between q-my-lg q-pa-md"
+      class="row items-center justify-between q-py-xl q-px-md"
     >
       <div class="text-center">
         <span class="text-bold">{{ totalCalories }}</span> Calories<br />eaten
@@ -46,7 +34,7 @@
       </div>
     </q-card>
 
-    <q-markup-table class="q-px-lg">
+    <q-markup-table class="q-px-lg q-my-md bg-grey-1">
       <thead>
         <tr>
           <th style="font-size: 0.9rem" class="text-left">Food</th>
@@ -78,13 +66,22 @@
         @click="showAddFoodDialog()"
       />
     </div>
+    <div
+      class="fixed-bottom row justify-center q-mb-md"
+    >
+      <q-btn 
+        round
+        color="primary"
+        outline
+        icon="content_copy"
+      />
+    </div>
   </q-page>
 </template>
 
 <script>
 import { defineComponent, reactive, ref, computed } from "vue";
 import { useQuasar } from "quasar";
-import { format } from "date-fns";
 import AddFoodDialog from "components/AddFoodDialog.vue";
 
 export default defineComponent({
@@ -93,7 +90,6 @@ export default defineComponent({
     const $q = useQuasar();
     const bodyWeight = ref(121);
     const targetCalories = 2800;
-    const date = ref(new Date());
     const foods = reactive([
       {
         name: "Frozen Yogurt",
@@ -143,9 +139,7 @@ export default defineComponent({
       });
     }
 
-    const formattedDate = computed(() => {
-      return format(date.value, "MMMM do, yyyy");
-    });
+
 
     return {
       foods,
@@ -153,10 +147,8 @@ export default defineComponent({
       targetCalories,
       totalCalories,
       progress,
-      date,
       showBodyWeightDialog,
       showAddFoodDialog,
-      formattedDate,
     };
   },
 });
