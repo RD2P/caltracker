@@ -145,6 +145,7 @@ import { defineComponent, ref, computed } from "vue";
 import { useQuasar } from "quasar";
 import { format } from "date-fns";
 import { v4 as uuidv4 } from "uuid";
+import EditFoodDialog from "components/EditFoodDialog.vue";
 
 export default defineComponent({
   name: "IndexPage",
@@ -215,16 +216,16 @@ export default defineComponent({
     function editFood(id) {
       const food = foods.value.find((f) => f.id === id);
       $q.dialog({
-        title: "Edit food",
-        message: "Enter new food info",
-        prompt: {
-          model: food.name,
-          type: "string",
+        component: EditFoodDialog,
+        componentProps: {
+          food: food,
         },
-        cancel: true,
-      }).onOk((value) => {
-        targetCalories.value = value;
-      });
+      }).onOk((data) => {
+        const indexToReplace = foods.value.findIndex(food => food.id === data.id);
+        if(indexToReplace !== -1) {
+          foods.value[indexToReplace] = { ...data };
+        }
+      })
     }
 
     function showBodyWeightDialog() {
