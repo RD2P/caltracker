@@ -1,12 +1,10 @@
 <template>
   <q-layout view="lHh Lpr lFf">
     <q-header elevated>
-      <q-toolbar class="row items-center justify-between">
-        <q-btn label="May 13th, 2024" flat  />
-        <q-btn label="Today" flat/>
+      <q-toolbar class="row justify-center">
+        <div class="text-center">Caltracker</div>
       </q-toolbar>
     </q-header>
-
     <q-page-container>
       <router-view />
     </q-page-container>
@@ -18,15 +16,5 @@ import { defineComponent} from 'vue'
 
 export default defineComponent({
   name: 'MainLayout',
-
-  components: {
-  },
-
-  setup () {
-
-    return {
-  
-    }
-  }
 })
 </script>
