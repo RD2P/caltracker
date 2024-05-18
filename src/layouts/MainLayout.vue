@@ -1,9 +1,9 @@
 <template>
   <q-layout view="lHh Lpr lFf">
     <q-header elevated>
-      <q-toolbar class="row justify-center">
-        <div class="text-center">Caltracker</div>
-      </q-toolbar>
+      <q-card-section>
+        <div class="text-bold text-center" style="font-size:1rem;">Caltracker</div>
+      </q-card-section>
     </q-header>
     <q-page-container>
       <router-view />
@@ -12,9 +12,9 @@
 </template>
 
 <script>
-import { defineComponent} from 'vue'
+import { defineComponent } from "vue";
 
 export default defineComponent({
-  name: 'MainLayout',
-})
+  name: "MainLayout",
+});
 </script>
