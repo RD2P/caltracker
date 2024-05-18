@@ -46,13 +46,13 @@
     <q-card
       flat
       style="font-size: 1rem"
-      class="row items-center justify-between q-py-xl q-px-md"
+      class="row items-center justify-evenly q-py-xl"
     >
       <div class="text-center">
         <span class="text-bold">{{ totalCalories }}</span> Calories<br />eaten
       </div>
 
-      <div>
+      <div class="column">
         <q-circular-progress
           show-value
           size="120px"
@@ -69,6 +69,9 @@
             <span class="text-caption">to go</span>
           </span>
         </q-circular-progress>
+        <div class="text-center q-mt-md">
+          Target: <span class="text-bold">{{ targetCalories }}</span>
+        </div>
       </div>
 
       <div class="text-center">
@@ -76,98 +79,153 @@
       </div>
     </q-card>
 
+    <!-- Table -->
     <q-markup-table class="q-px-lg q-mt-md bg-grey-1">
       <thead>
         <tr>
           <th style="font-size: 0.9rem" class="text-left">Food</th>
           <th style="font-size: 0.9rem" class="text-right">Calories</th>
+          <th class="text-right">
+            <q-btn
+              flat
+              color="green"
+              :icon="showInputRow ? 'cancel' : 'add'"
+              @click="showInputRow = !showInputRow"
+            />
+          </th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="food in foods" :key="food.name">
+        <tr v-if="showInputRow">
+          <td>
+            <q-input dense v-model="newFood.name" />
+          </td>
+          <td>
+            <q-input
+              dense
+              type="number"
+              input-class="text-right"
+              v-model="newFood.calories"
+            />
+          </td>
+          <td><q-btn flat color="green" label="ok" @click="addFood()" /></td>
+        </tr>
+        <tr v-for="food in foods" :key="food.id">
           <td class="text-left">{{ food.name }}</td>
           <td class="text-right">{{ food.calories }}</td>
+          <td class="text-right">
+            <q-btn
+              flat
+              color="grey-7"
+              icon="edit"
+              size="sm"
+              @click="editFood(food.id)"
+            />
+          </td>
         </tr>
       </tbody>
     </q-markup-table>
 
-    <div style="height:150px;"></div>
+    <div style="height: 150px"></div>
 
-    <div
-      class="fixed-bottom-right q-mb-md q-mr-md column items-center q-gutter-y-md z-top"
-    >
+    <div class="fixed-bottom-right q-mb-md q-mr-md column q-gutter-y-md">
       <q-btn
         round
         color="orange"
         icon="scale"
         @click="showBodyWeightDialog()"
       />
-      <q-btn
-        round
-        size="lg"
-        icon="add_circle"
-        color="green"
-        @click="showAddFoodDialog()"
-      />
-    </div>
-
-    <div class="fixed-bottom q-mb-md row justify-center">
-      <q-btn
-        round
-        color="primary"
-        outline
-        icon="content_copy"
-        @click="copy()"
-      />
+      <q-btn round color="blue-6" icon="content_copy" @click="copy()" />
     </div>
   </q-page>
 </template>
 
 <script>
-import { defineComponent, reactive, ref, computed } from "vue";
+import { defineComponent, ref, computed } from "vue";
 import { useQuasar } from "quasar";
-import AddFoodDialog from "components/AddFoodDialog.vue";
 import { format } from "date-fns";
+import { v4 as uuidv4 } from "uuid";
 
 export default defineComponent({
   name: "IndexPage",
   setup() {
     const $q = useQuasar();
+    const targetCalories = ref(2800);
     const bodyWeight = ref(121);
-    const targetCalories = 2800;
-    const foods = reactive([
+    const showInputRow = ref(false);
+
+    const foods = ref([
       {
+        id: "ec8d2f3e-bce9-40f2-978c-fdb3e2090e73",
         name: "Frozen Yogurt",
         calories: 500,
       },
       {
+        id: "ec8d2f3e-bce9-40f2-978c-fdb3e2090e75",
         name: "Banana",
         calories: 200,
       },
       {
+        id: "ec8d2f3e-bce9-40f2-978c-fdb3e2090e74",
         name: "Bread",
         calories: 300,
       },
       {
+        id: "ec8d2f3e-bce9-40f2-978c-fdb3e2090e78",
         name: "Spag",
         calories: 100,
       },
     ]);
 
+    const newFood = ref({
+      name: "",
+      calories: 0,
+    });
+
     const totalCalories = computed(() => {
       let total = 0;
-      foods.forEach((food) => {
-        total += food.calories;
+      foods.value.forEach((food) => {
+        total += Number(food.calories);
       });
       return total;
     });
 
-    const progress = (totalCalories.value / targetCalories) * 100;
+    const progress = (totalCalories.value / targetCalories.value) * 100;
 
     const formattedDate = computed(() => {
-      const date = new Date()
+      const date = new Date();
       return format(date, "MMMM do, yyyy");
     });
+
+    function addFood() {
+      if (newFood.value.name !== "" && newFood.value.calories !== 0) {
+        foods.value.push({
+          id: uuidv4(),
+          name: newFood.value.name,
+          calories: Number(newFood.value.calories),
+        });
+        showInputRow.value = false;
+        newFood.value = {
+          name: "",
+          calories: 0,
+        };
+      }
+    }
+
+    function editFood(id) {
+      const food = foods.value.find((f) => f.id === id);
+      $q.dialog({
+        title: "Edit food",
+        message: "Enter new food info",
+        prompt: {
+          model: food.name,
+          type: "string",
+        },
+        cancel: true,
+      }).onOk((value) => {
+        targetCalories.value = value;
+      });
+    }
 
     function showBodyWeightDialog() {
       $q.dialog({
@@ -183,9 +241,43 @@ export default defineComponent({
       });
     }
 
-    function showAddFoodDialog() {
+    function flush() {
       $q.dialog({
-        component: AddFoodDialog,
+        title: "Are you sure?",
+        message: "This will delete all data.",
+        cancel: {
+          flat: true,
+          color: "blue-5",
+          noCaps: true,
+        },
+        ok: {
+          color: "red",
+          label: "delete",
+        },
+      }).onOk(() => {
+        foods.value = [];
+        bodyWeight.value = 0;
+
+        $q.notify({
+          message: "All data flushed",
+          color: "red",
+          textColor: "white",
+        });
+        console.log("flushed");
+      });
+    }
+
+    function editTargetCalories() {
+      $q.dialog({
+        title: "Edit Target Calories",
+        message: "What is your new daily Calorie target?",
+        prompt: {
+          model: targetCalories.value,
+          type: "number",
+        },
+        cancel: true,
+      }).onOk((value) => {
+        targetCalories.value = value;
       });
     }
 
@@ -197,20 +289,26 @@ export default defineComponent({
         caption: "Date, Body weight, Total Calories",
         color: "white",
         textColor: "primary",
-        closeBtn: "close"
+        closeBtn: "close",
       });
-      console.log('copied')
     }
 
     return {
       foods,
+      newFood,
+      addFood,
+      editFood,
       bodyWeight,
       targetCalories,
       totalCalories,
       progress,
       showBodyWeightDialog,
-      showAddFoodDialog,
       copy,
+      flush,
+      confirm: ref(false),
+      formattedDate,
+      editTargetCalories,
+      showInputRow,
     };
   },
 });
