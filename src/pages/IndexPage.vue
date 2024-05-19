@@ -116,10 +116,20 @@
           <td class="text-right">
             <q-btn
               flat
-              color="grey-7"
+              round
+              color="blue"
               icon="edit"
               size="sm"
               @click="editFood(food.id)"
+            />
+            <q-btn
+              flat
+              round
+              color="red-4"
+              icon="delete"
+              size="sm"
+              class="q-ml-md"
+              @click="deleteFood(food.id)"
             />
           </td>
         </tr>
@@ -221,11 +231,40 @@ export default defineComponent({
           food: food,
         },
       }).onOk((data) => {
-        const indexToReplace = foods.value.findIndex(food => food.id === data.id);
-        if(indexToReplace !== -1) {
+        const indexToReplace = foods.value.findIndex(
+          (food) => food.id === data.id
+        );
+        if (indexToReplace !== -1) {
           foods.value[indexToReplace] = { ...data };
         }
-      })
+      });
+    }
+
+    function deleteFood(id) {
+      $q.dialog({
+        title: "Are you sure?",
+        message: "This will delete the food.",
+        cancel: {
+          flat: true,
+          color: "blue-5",
+          noCaps: true,
+        },
+        ok: {
+          color: "red",
+          unelevated: true,
+          label: "delete",
+        },
+      }).onOk(() => {
+        const indexToDelete = foods.value.findIndex((food) => food.id === id);
+        if (indexToDelete !== -1) {
+          foods.value.splice(indexToDelete, 1);
+        }
+        $q.notify({
+          message: "Food deleted",
+          color: "red",
+          textColor: "white",
+        });
+      });
     }
 
     function showBodyWeightDialog() {
@@ -264,7 +303,6 @@ export default defineComponent({
           color: "red",
           textColor: "white",
         });
-        console.log("flushed");
       });
     }
 
@@ -297,19 +335,20 @@ export default defineComponent({
     return {
       foods,
       newFood,
-      addFood,
-      editFood,
       bodyWeight,
       targetCalories,
       totalCalories,
       progress,
+      confirm: ref(false),
+      formattedDate,
+      showInputRow,
+      addFood,
+      editFood,
+      deleteFood,
       showBodyWeightDialog,
       copy,
       flush,
-      confirm: ref(false),
-      formattedDate,
       editTargetCalories,
-      showInputRow,
     };
   },
 });
