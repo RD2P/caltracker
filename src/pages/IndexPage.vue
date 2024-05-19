@@ -181,7 +181,9 @@ export default defineComponent({
       return total;
     });
 
-    const progress = (totalCalories.value / targetCalories.value) * 100;
+    const progress = computed(() => {
+      return (totalCalories.value / targetCalories.value) * 100
+    });
 
     const formattedDate = computed(() => {
       const date = new Date();
