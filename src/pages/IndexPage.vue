@@ -162,30 +162,10 @@ export default defineComponent({
   setup() {
     const $q = useQuasar();
     const targetCalories = ref(2800);
-    const bodyWeight = ref(121);
+    const bodyWeight = ref(0);
     const showInputRow = ref(false);
 
     const foods = ref([
-      {
-        id: "ec8d2f3e-bce9-40f2-978c-fdb3e2090e73",
-        name: "Frozen Yogurt",
-        calories: 500,
-      },
-      {
-        id: "ec8d2f3e-bce9-40f2-978c-fdb3e2090e75",
-        name: "Banana",
-        calories: 200,
-      },
-      {
-        id: "ec8d2f3e-bce9-40f2-978c-fdb3e2090e74",
-        name: "Bread",
-        calories: 300,
-      },
-      {
-        id: "ec8d2f3e-bce9-40f2-978c-fdb3e2090e78",
-        name: "Spag",
-        calories: 100,
-      },
     ]);
 
     const newFood = ref({
