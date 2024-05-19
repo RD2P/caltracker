@@ -141,7 +141,7 @@
     <div class="fixed-bottom-right q-mb-md q-mr-md column q-gutter-y-md">
       <q-btn
         round
-        color="orange"
+        :color="bodyWeight > 0 ? 'orange' : 'red'"
         icon="scale"
         @click="showBodyWeightDialog()"
       />
