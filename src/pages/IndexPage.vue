@@ -165,8 +165,7 @@ export default defineComponent({
     const bodyWeight = ref(0);
     const showInputRow = ref(false);
 
-    const foods = ref([
-    ]);
+    const foods = ref([]);
 
     const newFood = ref({
       name: "",
@@ -182,7 +181,7 @@ export default defineComponent({
     });
 
     const progress = computed(() => {
-      return (totalCalories.value / targetCalories.value) * 100
+      return (totalCalories.value / targetCalories.value) * 100;
     });
 
     const formattedDate = computed(() => {
@@ -191,7 +190,7 @@ export default defineComponent({
     });
 
     function addFood() {
-      if (newFood.value.name !== "" && newFood.value.calories !== 0) {
+      if (newFood.value.name !== "" && newFood.value.calories > 0) {
         foods.value.push({
           id: uuidv4(),
           name: newFood.value.name,
@@ -213,11 +212,13 @@ export default defineComponent({
           food: food,
         },
       }).onOk((data) => {
-        const indexToReplace = foods.value.findIndex(
-          (food) => food.id === data.id
-        );
-        if (indexToReplace !== -1) {
-          foods.value[indexToReplace] = { ...data };
+        if (data.name !== "" && data.calories > 0) {
+          const indexToReplace = foods.value.findIndex(
+            (food) => food.id === data.id
+          );
+          if (indexToReplace !== -1) {
+            foods.value[indexToReplace] = { ...data };
+          }
         }
       });
     }
