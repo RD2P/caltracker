@@ -1,7 +1,7 @@
 <template>
   <q-page class="bg-grey-2">
     <div class="row no-wrap justify-between items-center q-px-lg">
-      <div class="text-center q-py-md text-subtitle2">{{ formattedDate }}</div>
+      <div class="text-center q-py-md text-subtitle2">{{ formattedDate() }}</div>
       <div>
         <q-btn-dropdown
           flat
@@ -70,7 +70,7 @@
           </span>
         </q-circular-progress>
         <div class="text-center q-mt-md">
-          Target: <span class="text-bold">{{ targetCalories }}</span>
+          Target: <span class="text-bold">{{ targetCalories.value }}</span>
         </div>
       </div>
 
@@ -136,6 +136,11 @@
       </tbody>
     </q-markup-table>
 
+    <q-btn @click="prefs.getThing('name')">Get</q-btn>
+    <q-btn @click="prefs.removeThing('name')">Remove</q-btn>
+    <q-btn @click="prefs.getKeys()">Get Keys</q-btn>
+    <q-btn @click="prefs.clearAll()">Flush</q-btn>
+
     <div style="height: 150px"></div>
 
     <div class="fixed-bottom-right q-mb-md q-mr-md column q-gutter-y-md">
@@ -143,7 +148,7 @@
         round
         :color="bodyWeight > 0 ? 'orange' : 'red'"
         icon="scale"
-        @click="showBodyWeightDialog()"
+        @click="editBodyWeight()"
       />
       <q-btn round color="blue-6" icon="content_copy" @click="copy()" />
     </div>
@@ -153,17 +158,71 @@
 <script>
 import { defineComponent, ref, computed } from "vue";
 import { useQuasar } from "quasar";
-import { format } from "date-fns";
 import { v4 as uuidv4 } from "uuid";
 import EditFoodDialog from "components/EditFoodDialog.vue";
+import prefs from "src/services/preferences.js";
+import {formattedDate} from 'src/services/helpers.js'
 
 export default defineComponent({
   name: "IndexPage",
   setup() {
     const $q = useQuasar();
-    const targetCalories = ref(2800);
-    const bodyWeight = ref(0);
+
+        // *** SIMPLE STATES *** 
+
     const showInputRow = ref(false);
+
+        // *** TARGET CALORIES *** 
+
+    const targetCalories = ref(0);
+    const getTargetCalories = async () => {
+      return await prefs.getTargetCalories();
+    };
+    getTargetCalories().then((data) => {
+      targetCalories.value = data;
+    });
+    function editTargetCalories() {
+      $q.dialog({
+        title: "Edit Target Calories",
+        message: "What is your new daily Calorie target?",
+        prompt: {
+          model: targetCalories.value,
+          type: "number",
+        },
+        cancel: true,
+      }).onOk((input) => {
+        prefs.setTargetCalories(input).then(() => {
+          targetCalories.value = input;
+        });
+      });
+    }
+
+        // *** BODY WEIGHT *** 
+
+    const bodyWeight = ref(0);
+    const getBodyWeight = async () => {
+      return await prefs.getBodyWeight();
+    };
+    getBodyWeight().then((data) => {
+      bodyWeight.value = data;
+    });
+    function editBodyWeight() {
+      $q.dialog({
+        title: "Edit Body Weight",
+        message: "What is your current body weight?",
+        prompt: {
+          model: bodyWeight.value,
+          type: "number",
+        },
+        cancel: true,
+      }).onOk((input) => {
+        prefs.setBodyWeight(input).then(() => {
+          bodyWeight.value = input;
+        });
+      });
+    }
+
+          // *** FOODS *** 
 
     const foods = ref([]);
 
@@ -245,19 +304,7 @@ export default defineComponent({
       });
     }
 
-    function showBodyWeightDialog() {
-      $q.dialog({
-        title: "Body weight",
-        message: "How much do you weigh today?",
-        prompt: {
-          model: bodyWeight.value,
-          type: "number",
-        },
-        cancel: true,
-      }).onOk((value) => {
-        bodyWeight.value = value;
-      });
-    }
+        // *** FUNCTIONS *** 
 
     function flush() {
       $q.dialog({
@@ -284,20 +331,6 @@ export default defineComponent({
       });
     }
 
-    function editTargetCalories() {
-      $q.dialog({
-        title: "Edit Target Calories",
-        message: "What is your new daily Calorie target?",
-        prompt: {
-          model: targetCalories.value,
-          type: "number",
-        },
-        cancel: true,
-      }).onOk((value) => {
-        targetCalories.value = value;
-      });
-    }
-
     function copy() {
       const text = `${formattedDate()}\nBody Weight: ${bodyWeight.value} lbs\nTotal Calories: ${totalCalories.value}`;
       navigator.clipboard.writeText(text);
@@ -321,7 +354,7 @@ export default defineComponent({
       addFood,
       editFood,
       deleteFood,
-      showBodyWeightDialog,
+      editBodyWeight,
       copy,
       flush,
       editTargetCalories,

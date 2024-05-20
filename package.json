@@ -13,6 +13,7 @@
     "build": "quasar build"
   },
   "dependencies": {
+    "@capacitor/preferences": "^6.0.0",
     "@quasar/extras": "^1.16.4",
     "date-fns": "^3.6.0",
     "quasar": "^2.8.0",
