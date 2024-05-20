@@ -184,11 +184,6 @@ export default defineComponent({
       return (totalCalories.value / targetCalories.value) * 100;
     });
 
-    const formattedDate = computed(() => {
-      const date = new Date();
-      return format(date, "MMMM do, yyyy");
-    });
-
     function addFood() {
       if (newFood.value.name !== "" && newFood.value.calories > 0) {
         foods.value.push({
@@ -304,7 +299,7 @@ export default defineComponent({
     }
 
     function copy() {
-      const text = `${formattedDate.value}\nBody Weight: ${bodyWeight.value} lbs\nTotal Calories: ${totalCalories.value}`;
+      const text = `${formattedDate()}\nBody Weight: ${bodyWeight.value} lbs\nTotal Calories: ${totalCalories.value}`;
       navigator.clipboard.writeText(text);
       $q.notify({
         message: "Copied info to clipboard:",
@@ -322,8 +317,6 @@ export default defineComponent({
       targetCalories,
       totalCalories,
       progress,
-      confirm: ref(false),
-      formattedDate,
       showInputRow,
       addFood,
       editFood,
@@ -332,6 +325,8 @@ export default defineComponent({
       copy,
       flush,
       editTargetCalories,
+      prefs,
+      formattedDate
     };
   },
 });
