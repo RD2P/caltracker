@@ -1,7 +1,9 @@
 <template>
   <q-page class="bg-grey-2">
     <div class="row no-wrap justify-between items-center q-px-lg">
-      <div class="text-center q-py-md text-subtitle2">{{ formattedDate() }}</div>
+      <div class="text-center q-py-md text-subtitle2">
+        {{ formattedDate() }}
+      </div>
       <div>
         <q-btn-dropdown
           flat
@@ -62,15 +64,15 @@
           class="text-center"
         >
           <span style="line-height: 0.8rem">
-            <span style="font-size: 1.3rem" class="text-bold">{{
-              targetCalories - totalCalories
-            }}</span
-            ><br />
+            <span style="font-size: 1.3rem" class="text-bold">
+              {{ targetCalories - totalCalories }}
+            </span>
+            <br />
             <span class="text-caption">to go</span>
           </span>
         </q-circular-progress>
         <div class="text-center q-mt-md">
-          Target: <span class="text-bold">{{ targetCalories.value }}</span>
+          Target: <span class="text-bold">{{ targetCalories }}</span>
         </div>
       </div>
 
@@ -136,11 +138,6 @@
       </tbody>
     </q-markup-table>
 
-    <q-btn @click="prefs.getThing('name')">Get</q-btn>
-    <q-btn @click="prefs.removeThing('name')">Remove</q-btn>
-    <q-btn @click="prefs.getKeys()">Get Keys</q-btn>
-    <q-btn @click="prefs.clearAll()">Flush</q-btn>
-
     <div style="height: 150px"></div>
 
     <div class="fixed-bottom-right q-mb-md q-mr-md column q-gutter-y-md">
@@ -156,31 +153,34 @@
 </template>
 
 <script>
-import { defineComponent, ref, computed } from "vue";
 import { useQuasar } from "quasar";
-import { v4 as uuidv4 } from "uuid";
+import { defineComponent, ref, computed } from "vue";
 import EditFoodDialog from "components/EditFoodDialog.vue";
+import { formattedDate } from "src/services/helpers.js";
 import prefs from "src/services/preferences.js";
-import {formattedDate} from 'src/services/helpers.js'
+import { v4 as uuidv4 } from "uuid";
 
 export default defineComponent({
   name: "IndexPage",
   setup() {
     const $q = useQuasar();
 
-        // *** SIMPLE STATES *** 
+    // *** SIMPLE STATES ***
 
     const showInputRow = ref(false);
 
-        // *** TARGET CALORIES *** 
+    // *** TARGET CALORIES ***
 
     const targetCalories = ref(0);
+
     const getTargetCalories = async () => {
       return await prefs.getTargetCalories();
     };
+
     getTargetCalories().then((data) => {
       targetCalories.value = data;
     });
+
     function editTargetCalories() {
       $q.dialog({
         title: "Edit Target Calories",
@@ -197,15 +197,16 @@ export default defineComponent({
       });
     }
 
-        // *** BODY WEIGHT *** 
+    // *** BODY WEIGHT ***
 
     const bodyWeight = ref(0);
+
     const getBodyWeight = async () => {
       return await prefs.getBodyWeight();
     };
-    getBodyWeight().then((data) => {
-      bodyWeight.value = data;
-    });
+
+    getBodyWeight().then((data) => (bodyWeight.value = data));
+
     function editBodyWeight() {
       $q.dialog({
         title: "Edit Body Weight",
@@ -222,34 +223,25 @@ export default defineComponent({
       });
     }
 
-          // *** FOODS *** 
+    // *** FOODS ***
 
     const foods = ref([]);
 
-    const newFood = ref({
-      name: "",
-      calories: 0,
-    });
+    const getFoods = async () => {
+      return await prefs.getFoods();
+    };
 
-    const totalCalories = computed(() => {
-      let total = 0;
-      foods.value.forEach((food) => {
-        total += Number(food.calories);
-      });
-      return total;
-    });
-
-    const progress = computed(() => {
-      return (totalCalories.value / targetCalories.value) * 100;
-    });
+    getFoods().then((data) => (foods.value = data));
 
     function addFood() {
       if (newFood.value.name !== "" && newFood.value.calories > 0) {
-        foods.value.push({
+        const entry = {
           id: uuidv4(),
           name: newFood.value.name,
           calories: Number(newFood.value.calories),
-        });
+        };
+        prefs.addFood(entry);
+        foods.value.push(entry);
         showInputRow.value = false;
         newFood.value = {
           name: "",
@@ -257,6 +249,11 @@ export default defineComponent({
         };
       }
     }
+
+    const newFood = ref({
+      name: "",
+      calories: 0,
+    });
 
     function editFood(id) {
       const food = foods.value.find((f) => f.id === id);
@@ -272,6 +269,7 @@ export default defineComponent({
           );
           if (indexToReplace !== -1) {
             foods.value[indexToReplace] = { ...data };
+            prefs.setFoods(foods.value);
           }
         }
       });
@@ -295,6 +293,7 @@ export default defineComponent({
         const indexToDelete = foods.value.findIndex((food) => food.id === id);
         if (indexToDelete !== -1) {
           foods.value.splice(indexToDelete, 1);
+          prefs.setFoods(foods.value);
         }
         $q.notify({
           message: "Food deleted",
@@ -304,7 +303,17 @@ export default defineComponent({
       });
     }
 
-        // *** FUNCTIONS *** 
+    const totalCalories = computed(() => {
+      let total = 0;
+      foods.value.forEach((food) => {
+        total += Number(food.calories);
+      });
+      return total;
+    });
+
+    const progress = computed(() => (totalCalories.value / targetCalories.value) * 100);
+
+    // *** FUNCTIONS ***
 
     function flush() {
       $q.dialog({
@@ -322,6 +331,8 @@ export default defineComponent({
       }).onOk(() => {
         foods.value = [];
         bodyWeight.value = 0;
+        targetCalories.value = 0;
+        prefs.clearAll();
 
         $q.notify({
           message: "All data flushed",
@@ -332,7 +343,9 @@ export default defineComponent({
     }
 
     function copy() {
-      const text = `${formattedDate()}\nBody Weight: ${bodyWeight.value} lbs\nTotal Calories: ${totalCalories.value}`;
+      const text = `${formattedDate()}\nBody Weight: ${
+        bodyWeight.value
+      } lbs\nTotal Calories: ${totalCalories.value}`;
       navigator.clipboard.writeText(text);
       $q.notify({
         message: "Copied info to clipboard:",
@@ -351,6 +364,7 @@ export default defineComponent({
       totalCalories,
       progress,
       showInputRow,
+      prefs,
       addFood,
       editFood,
       deleteFood,
@@ -358,8 +372,7 @@ export default defineComponent({
       copy,
       flush,
       editTargetCalories,
-      prefs,
-      formattedDate
+      formattedDate,
     };
   },
 });

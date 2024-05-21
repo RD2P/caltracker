@@ -34,16 +34,30 @@ const setBodyWeight = async (value) => {
   });
 };
 
-const getThing = async (key) => {
-  const thing = await Preferences.get({ key: key });
-  console.log(thing)
-}
-const removeThing = async (thing) => {
-  await Preferences.remove({ key: thing });
-};
-const getKeys = async () => {
+const getFoods = async () => {
   const keys = await Preferences.keys();
-  console.log(keys);
+  if (keys.keys.includes("foods")) {
+    const foods = await Preferences.get({ key: "foods" });
+    return JSON.parse(foods.value);
+  } else {
+    return [];
+  }
+};
+
+const addFood = async (value) => {
+  const foods = await getFoods();
+  foods.push(value)
+  await Preferences.set({
+    key: "foods",
+    value: JSON.stringify(foods),
+  });
+};
+
+const setFoods = async (value) => {
+  await Preferences.set({
+    key: "foods",
+    value: JSON.stringify(value),
+  });
 };
 
 const clearAll = async () => {
@@ -55,7 +69,8 @@ export default {
   setTargetCalories,
   getBodyWeight,
   setBodyWeight,
+  getFoods,
+  addFood,
+  setFoods,
   clearAll,
-  
-  getThing, removeThing, getKeys,
-};
+}
