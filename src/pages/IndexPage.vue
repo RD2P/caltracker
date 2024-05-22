@@ -217,9 +217,8 @@ export default defineComponent({
         },
         cancel: true,
       }).onOk((input) => {
-        prefs.setBodyWeight(input).then(() => {
-          bodyWeight.value = input;
-        });
+        bodyWeight.value = input
+        prefs.setBodyWeight(input)
       });
     }
 
