@@ -1,10 +1,10 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace "org.capacitor.quasar.app"
+    namespace "com.rafdlr.caltracker"
     compileSdk rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "org.capacitor.quasar.app"
+        applicationId "com.rafdlr.caltracker"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

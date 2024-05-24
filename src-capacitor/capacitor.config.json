@@ -1,5 +1,5 @@
 {
-  "appId": "org.capacitor.quasar.app",
-  "appName": "caltracker",
+  "appId": "com.rafdlr.caltracker",
+  "appName": "Caltracker",
   "webDir": "www"
 }
