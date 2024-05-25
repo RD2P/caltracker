@@ -16,6 +16,7 @@
     "@capacitor/preferences": "^6.0.0",
     "@quasar/extras": "^1.16.4",
     "date-fns": "^3.6.0",
+    "firebase": "^10.12.1",
     "quasar": "^2.8.0",
     "uuid": "^9.0.1",
     "vue": "^3.4.18",
