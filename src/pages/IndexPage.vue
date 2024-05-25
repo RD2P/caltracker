@@ -2,7 +2,6 @@
   <q-page class="bg-grey-2">
     <TopBar />
     <SummaryBanner />
-
     <FoodTable />
 
     <q-btn color="primary" label="Get fire foods" @click="handleClick()" />
@@ -13,15 +12,7 @@
 
     <div style="height: 150px"></div>
 
-    <div class="fixed-bottom-right q-mb-md q-mr-md column q-gutter-y-md">
-      <q-btn
-        round
-        :color="bodyWeight > 0 ? 'orange' : 'red'"
-        icon="scale"
-        @click="editBodyWeight()"
-      />
-      <q-btn round color="blue-6" icon="content_copy" @click="copy()" />
-    </div>
+    <BottomButtons />
   </q-page>
 </template>
 
@@ -35,6 +26,7 @@ import { getFireFoods, getBodyWeight } from "src/services/firestore.js";
 import SummaryBanner from "src/components/SummaryBanner.vue";
 import FoodTable from "src/components/FoodTable.vue";
 import TopBar from "src/components/TopBar.vue";
+import BottomButtons from "src/components/BottomButtons.vue";
 
 export default defineComponent({
   name: "IndexPage",
@@ -42,6 +34,7 @@ export default defineComponent({
     TopBar,
     SummaryBanner,
     FoodTable,
+    BottomButtons
   },
   setup() {
     const $q = useQuasar();
