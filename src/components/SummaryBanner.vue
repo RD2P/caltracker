@@ -5,7 +5,7 @@
       class="row items-center justify-evenly q-py-xl"
     >
       <div class="text-center">
-        <span class="text-bold">{{ totalCalories }}</span> Calories<br />eaten
+        <span class="text-bold">{{ caloriesEaten }}</span> Calories<br />eaten
       </div>
 
       <div class="column">
@@ -35,11 +35,13 @@
       </div>
     </q-card>
 </template>
+
 <script>
-export default {
-  
-}
+import {defineComponent} from "vue"
+
+export default defineComponent({
+  name: "SumaryBanner"
+})
 </script>
-<style lang="">
-  
-</style>
+
+<style lang=""></style>

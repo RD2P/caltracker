@@ -44,62 +44,15 @@
       </div>
     </div>
 
-    <!-- Table -->
-    <q-markup-table class="q-px-lg q-mt-md bg-grey-1">
-      <thead>
-        <tr>
-          <th style="font-size: 0.9rem" class="text-left">Food</th>
-          <th style="font-size: 0.9rem" class="text-right">Calories</th>
-          <th class="text-right">
-            <q-btn
-              flat
-              color="green"
-              :icon="showInputRow ? 'cancel' : 'add'"
-              @click="showInputRow = !showInputRow"
-            />
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-if="showInputRow">
-          <td>
-            <q-input dense v-model="newFood.name" />
-          </td>
-          <td>
-            <q-input
-              dense
-              type="number"
-              input-class="text-right"
-              v-model="newFood.calories"
-            />
-          </td>
-          <td><q-btn flat color="green" label="ok" @click="addFood()" /></td>
-        </tr>
-        <tr v-for="food in foods" :key="food.id">
-          <td class="text-left">{{ food.name }}</td>
-          <td class="text-right">{{ food.calories }}</td>
-          <td class="text-right">
-            <q-btn
-              flat
-              round
-              color="blue"
-              icon="edit"
-              size="sm"
-              @click="editFood(food.id)"
-            />
-            <q-btn
-              flat
-              round
-              color="red-4"
-              icon="delete"
-              size="sm"
-              class="q-ml-md"
-              @click="deleteFood(food.id)"
-            />
-          </td>
-        </tr>
-      </tbody>
-    </q-markup-table>
+    <SummaryBanner />
+
+    <FoodTable />
+
+    <q-btn color="primary" label="Get fire foods" @click="handleClick()" />
+    {{ fireFoods ? fireFoods : "nothing yet" }}
+
+    <q-btn label="Fireweight" @click="getFireweight()" />
+    {{ fireweight ? fireweight : "No weight" }}
 
     <div style="height: 150px"></div>
 
@@ -121,10 +74,16 @@ import { defineComponent, ref, computed } from "vue";
 import EditFoodDialog from "components/EditFoodDialog.vue";
 import { formattedDate } from "src/services/helpers.js";
 import prefs from "src/services/preferences.js";
-import { v4 as uuidv4 } from "uuid";
+import { getFireFoods, getBodyWeight } from "src/services/firestore.js";
+import SummaryBanner from "src/components/SummaryBanner.vue";
+import FoodTable from "src/components/FoodTable.vue";
 
 export default defineComponent({
   name: "IndexPage",
+  components: {
+    SummaryBanner,
+    FoodTable,
+  },
   setup() {
     const $q = useQuasar();
 
