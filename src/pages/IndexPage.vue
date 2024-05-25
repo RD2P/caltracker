@@ -34,7 +34,7 @@ export default defineComponent({
     TopBar,
     SummaryBanner,
     FoodTable,
-    BottomButtons
+    BottomButtons,
   },
   setup() {
     const $q = useQuasar();
