@@ -17,13 +17,14 @@
     <tbody>
       <tr v-if="showInputRow">
         <td>
-          <q-input dense v-model="newFood.name" />
+          <q-input dense autofocus placeholder="food" v-model="newFood.name" />
         </td>
         <td>
           <q-input
             dense
             type="number"
             input-class="text-right"
+            placeholder="calories"
             v-model="newFood.calories"
           />
         </td>
@@ -57,10 +58,94 @@
 </template>
 
 <script>
-import { defineComponent } from "vue";
+import { defineComponent, ref } from "vue";
+import { useQuasar } from "quasar";
+import { v4 as uuid } from "uuid";
+import EditFoodDialog from "components/EditFoodDialog.vue";
 
 export default defineComponent({
   name: "FoodTable",
+  setup() {
+    const $q = useQuasar();
+    const showInputRow = ref(false);
+    const foods = ref([]);
+
+    const newFood = ref({
+      name: "",
+      calories: null,
+    });
+
+    function addFood() {
+      if (newFood.value.name !== "" && newFood.value.calories > 0) {
+        const entry = {
+          id: uuid(),
+          name: newFood.value.name,
+          calories: Number(newFood.value.calories),
+        };
+        foods.value.push(entry);
+        showInputRow.value = false;
+        newFood.value = {
+          name: "",
+          calories: null,
+        };
+      }
+    }
+
+    function editFood(id) {
+      const food = foods.value.find((f) => f.id === id);
+      $q.dialog({
+        component: EditFoodDialog,
+        componentProps: {
+          food: food,
+        },
+      }).onOk((data) => {
+        if (data.name !== "" && data.calories > 0) {
+          const indexToReplace = foods.value.findIndex(
+            (food) => food.id === data.id
+          );
+          if (indexToReplace !== -1) {
+            foods.value[indexToReplace] = { ...data };
+          }
+        }
+      });
+    }
+
+    function deleteFood(id) {
+      $q.dialog({
+        title: "Are you sure?",
+        message: "This will delete the food.",
+        cancel: {
+          flat: true,
+          color: "blue-5",
+          noCaps: true,
+        },
+        ok: {
+          color: "red",
+          unelevated: true,
+          label: "delete",
+        },
+      }).onOk(() => {
+        const indexToDelete = foods.value.findIndex((food) => food.id === id);
+        if (indexToDelete !== -1) {
+          foods.value.splice(indexToDelete, 1);
+        }
+        $q.notify({
+          message: "Food deleted",
+          color: "red",
+          textColor: "white",
+        });
+      });
+    }
+
+    return {
+      showInputRow,
+      foods,
+      newFood,
+      addFood,
+      editFood,
+      deleteFood,
+    };
+  },
 });
 </script>
 
