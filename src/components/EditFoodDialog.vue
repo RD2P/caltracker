@@ -6,7 +6,7 @@
       </q-card-section>
 
       <q-card-section class="row no-wrap">
-        <q-input label="Food" class="col-8" v-model="entry.name" />
+        <q-input label="Food" class="col-8" v-model="entry.name" autofocus/>
         <q-separator vertical inset class="q-mx-sm" />
         <q-input label="Calories" type="number" v-model="entry.calories" />
       </q-card-section>
